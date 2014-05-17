@@ -70,6 +70,20 @@ def next(lrrbot, conn, event, respond_to):
 		conn.privmsg(respond_to, "Next scheduled stream: %s at %s (%s)" % (event_name, nice_time, nice_duration))
 	else:
 		conn.privmsg(respond_to, "There don't seem to be any upcoming scheduled streams")
+		
+@bot.command("event")
+@utils.throttle()
+def next(lrrbot, conn, event, respond_to):
+	"""
+	Gets the current event from the calendar
+	mostly for driver testing purpose
+	will remove
+	"""
+	event_name = googlecalendar.get_current_event()
+	if event_name is not None:
+		conn.privmsg(respond_to, "Current event: %s" % (event_name))
+	else:
+		conn.privmsg(respond_to, "There is no current event")
 
 @bot.command("time")
 @utils.throttle()

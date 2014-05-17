@@ -6,8 +6,8 @@ import dateutil.rrule
 import operator
 
 CACHE_EXPIRY = 15*60
-URL = "http://www.google.com/calendar/ical/loadingreadyrun.com_72jmf1fn564cbbr84l048pv1go%40group.calendar.google.com/public/basic.ics"
-
+#URL = "http://www.google.com/calendar/ical/loadingreadyrun.com_72jmf1fn564cbbr84l048pv1go%40group.calendar.google.com/public/basic.ics"
+URL = "https://www.google.com/calendar/ical/4gv3trfvftobcfsq1c7quvht8s%40group.calendar.google.com/public/basic.ics"
 @utils.throttle(CACHE_EXPIRY)
 def get_calendar_data():
 	ical = utils.http_request(URL)
@@ -63,6 +63,22 @@ def get_next_event(after=None, all=False):
 		return event_name, event_time, event_wait
 	else:
 		return None, None, None
+		
+def get_current_event(after=None, all=False):
+	cal_data = get_calendar_data()
+	events = []
+	for ev in cal_data.subcomponents:
+		if isinstance(ev, icalendar.Event):
+			event_name = str(ev['summary'])
+			events.append(event_name)
+	if all:
+		events.sort(key=operator.itemgetter(1))
+		return events
+	if events:
+		event_name = min(events, key=operator.itemgetter(1))
+		return event_name
+	else:
+		return None
 
 def _apply_monkey_patch(rrule):
 	"""
