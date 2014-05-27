@@ -73,14 +73,14 @@ def next(lrrbot, conn, event, respond_to):
 		
 @bot.command("event")
 @utils.throttle()
-def next(lrrbot, conn, event, respond_to):
+def event(lrrbot, conn, event, respond_to):
 	"""
 	Gets the current event from the calendar
 	mostly for driver testing purpose
 	will remove
 	"""
 	event_name = googlecalendar.get_current_event()
-	if event_name is not None:
+	if event_name:
 		conn.privmsg(respond_to, "Current event: %s" % (event_name))
 	else:
 		conn.privmsg(respond_to, "There is no current event")

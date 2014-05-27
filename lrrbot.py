@@ -265,23 +265,33 @@ class LRRBot(irc.bot.SingleServerIRCBot):
 	@utils.throttle(GAME_CHECK_INTERVAL, log=False)
 	def get_current_game_real(self):
 		return twitch.get_game_playing()
-	
+
 	@utils.throttle(GAME_CHECK_INTERVAL, log=False)
-	def get_driver(func):
+	def get_driver(self, conn, event, respond_to):
 		event_name = googlecalendar.get_current_event()
 		if storage.data["show"]["previous"] == event_name:
 			return storage.data["show"]["driver"]
-		elif storage.data["show"][event_name] == event_name:
-			message = "New driver found, %s has passed the wheel to %s" % (storage.data["show"]["driver"], storage.data["show"][event_name])
-			storage.data["show"]["driver"] = storage.data["show"][event_name]
-			storage.data["show"]["previous"] = storage.data[event_name]
-			storage.save()
-			conn.privmsg(respond_to, message)
-			return storage.data["show"]["driver"]
+		elif storage.data["show"][event_name] is not None:
+			if self.title_check():
+				return storage.data["show"]["driver"]
+			else:
+				message = "New driver found, %s has passed the wheel to %s" % (storage.data["show"]["driver"], storage.data["show"][event_name])
+				storage.data["show"]["driver"] = storage.data["show"][event_name]
+				storage.data["show"]["previous"] = event_name
+				storage.data["show"]["title"] = twitch.get_title()
+				storage.save()
+				conn.privmsg(respond_to, message)
+				return storage.data["show"]["driver"]
 		else:
 			message = "Current show cannot be determined automaticly please contact the mods to update the driver if needed. Current driver: %s" % (storage.data["show"]["driver"])
 			conn.privmsg(respond_to, message)
-			return storage.data["show"]["driver"]		
+			return storage.data["show"]["driver"]
+			
+	def title_check(func):
+		if twitch.get_title() == storage.data["show"]["title"]:
+			return True
+		else:
+			return False
 
 	def is_mod(self, event):
 		"""Check whether the source of the event has mod privileges for the bot, or for the channel"""

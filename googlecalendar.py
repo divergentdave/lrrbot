@@ -65,17 +65,48 @@ def get_next_event(after=None, all=False):
 		return None, None, None
 		
 def get_current_event(after=None, all=False):
+	# If someone knows how to do this in a proper way go ahead and fix it
+	# Personally I'm done hitting my head against a brick wall
 	cal_data = get_calendar_data()
 	events = []
+	if after is None:
+		after = datetime.datetime.now(datetime.timezone.utc)
 	for ev in cal_data.subcomponents:
 		if isinstance(ev, icalendar.Event):
 			event_name = str(ev['summary'])
-			events.append(event_name)
-	if all:
-		events.sort(key=operator.itemgetter(1))
-		return events
+			event_time = ev['dtstart'].dt
+			exception_times = ev.get('exdate')
+			if not exception_times:
+				exception_times = []
+			elif not isinstance(exception_times, (tuple, list)):
+				exception_times = [exception_times]
+			exception_times = set(j.dt for i in exception_times for j in i.dts)
+			if not isinstance(event_time, datetime.datetime):
+				# ignore full-day events
+				continue
+			# Very hacky way of getting the current show
+			cutoff_delay = (ev['dtend'].dt - ev['dtstart'].dt)
+			event_time_cutoff = event_time + cutoff_delay
+			if 'rrule' in ev:
+				rrule = dateutil.rrule.rrulestr(ev['rrule'].to_ical().decode('utf-8'), dtstart=event_time_cutoff)
+				### MASSIVE HACK ALERT
+				_apply_monkey_patch(rrule)
+				### END MASSIVE HACK ALERT
+				# Find the next event in the recurrence that isn't an exception
+				search_date = after
+				while True:
+					search_date = rrule.after(search_date)
+					if search_date is None or search_date - cutoff_delay not in exception_times:
+						break
+				event_time_cutoff = search_date
+				if event_time_cutoff is None:
+					continue
+				event_time = event_time_cutoff - cutoff_delay
+			if event_time_cutoff > after:
+				events.append((event_name, event_time))
+				
 	if events:
-		event_name = min(events, key=operator.itemgetter(1))
+		event_name, event_time = min(events, key=operator.itemgetter(1))
 		return event_name
 	else:
 		return None

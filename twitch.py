@@ -71,3 +71,14 @@ def get_game_playing(username=None):
 	if channel_data['game'] is not None:
 		return get_game(name=channel_data['game'])
 	return None
+
+def get_title(username=None):
+	"""
+	Get the stream title
+	"""
+	channel_data = get_info(username, use_fallback=False)
+	if not channel_data or not channel_data['live']:
+		return None
+	else:
+		return channel_data['title']
+	#return None

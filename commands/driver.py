@@ -11,7 +11,7 @@ def current_driver(lrrbot, conn, event, respond_to):
 
 	Post the game currently being played.
 	"""
-	driver = lrrbot.get_driver()
+	driver = lrrbot.get_driver(conn, event, respond_to)
 	if driver is None:
 		message = "No one is driving the bus"
 	else:
