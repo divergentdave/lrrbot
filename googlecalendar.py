@@ -6,8 +6,9 @@ import dateutil.rrule
 import operator
 
 CACHE_EXPIRY = 15*60
-#URL = "http://www.google.com/calendar/ical/loadingreadyrun.com_72jmf1fn564cbbr84l048pv1go%40group.calendar.google.com/public/basic.ics"
-URL = "https://www.google.com/calendar/ical/4gv3trfvftobcfsq1c7quvht8s%40group.calendar.google.com/public/basic.ics"
+URL = "http://www.google.com/calendar/ical/loadingreadyrun.com_72jmf1fn564cbbr84l048pv1go%40group.calendar.google.com/public/basic.ics"
+#test calendar for when LRL isn't on
+#URL = "https://www.google.com/calendar/ical/4gv3trfvftobcfsq1c7quvht8s%40group.calendar.google.com/public/basic.ics"
 @utils.throttle(CACHE_EXPIRY)
 def get_calendar_data():
 	ical = utils.http_request(URL)
