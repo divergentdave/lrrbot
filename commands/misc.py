@@ -84,6 +84,19 @@ def event(lrrbot, conn, event, respond_to):
 		conn.privmsg(respond_to, "Current event: %s" % (event_name))
 	else:
 		conn.privmsg(respond_to, "There is no current event")
+		
+@bot.command("title")
+@utils.throttle()
+def event(lrrbot, conn, event, respond_to):
+	"""
+	Gets the current event from the calendar
+	mostly for driver testing purpose
+	will remove
+	"""
+	if twitch.get_title() is not None:
+		conn.privmsg(respond_to, "Current title: %s" % (twitch.get_title()))
+	else:
+		conn.privmsg(respond_to, "There is no current title")
 
 @bot.command("time")
 @utils.throttle()

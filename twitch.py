@@ -15,7 +15,8 @@ def get_info(username=None, use_fallback=True):
 	May throw exceptions on network/Twitch error.
 	"""
 	if username is None:
-		username = config['channel']
+	#	username = config['channel']
+		username = "loadingreadyrun"
 
 	# Attempt to get the channel data from /streams/channelname
 	# If this succeeds, it means the channel is currently live
@@ -79,6 +80,8 @@ def get_title(username=None):
 	channel_data = get_info(username, use_fallback=False)
 	if not channel_data or not channel_data['live']:
 		return None
-	else:
-		return channel_data['title']
-	#return None
+		
+	title_test = channel_data['status']
+	if title_test is not None:
+		return title_test
+	return None

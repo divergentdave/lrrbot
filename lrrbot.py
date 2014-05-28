@@ -271,10 +271,12 @@ class LRRBot(irc.bot.SingleServerIRCBot):
 		event_name = googlecalendar.get_current_event()
 		if storage.data["show"]["previous"] == event_name:
 			return storage.data["show"]["driver"]
-		elif storage.data["show"][event_name] is not None:
+		elif event_name in storage.data["show"]:
 			if self.title_check():
+				print("same title")
 				return storage.data["show"]["driver"]
 			else:
+				print("dif title")
 				message = "New driver found, %s has passed the wheel to %s" % (storage.data["show"]["driver"], storage.data["show"][event_name])
 				storage.data["show"]["driver"] = storage.data["show"][event_name]
 				storage.data["show"]["previous"] = event_name
