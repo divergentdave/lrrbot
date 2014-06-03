@@ -3,6 +3,9 @@ from lrrbot import bot
 import storage
 import utils
 
+def driver_name():
+    return storage.data["show"]["driver"]
+
 @bot.command("driver")
 @utils.throttle()
 def current_driver(lrrbot, conn, event, respond_to):

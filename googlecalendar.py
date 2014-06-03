@@ -66,8 +66,6 @@ def get_next_event(after=None, all=False):
 		return None, None, None
 		
 def get_current_event(after=None, all=False):
-	# If someone knows how to do this in a proper way go ahead and fix it
-	# Personally I'm done hitting my head against a brick wall
 	cal_data = get_calendar_data()
 	events = []
 	if after is None:
@@ -85,7 +83,8 @@ def get_current_event(after=None, all=False):
 			if not isinstance(event_time, datetime.datetime):
 				# ignore full-day events
 				continue
-			# Very hacky way of getting the current show
+			# Report episodes that are either in the first half, or started less than an hour ago
+			# Whichever is shorter
 			cutoff_delay = (ev['dtend'].dt - ev['dtstart'].dt)
 			event_time_cutoff = event_time + cutoff_delay
 			if 'rrule' in ev:
@@ -95,17 +94,15 @@ def get_current_event(after=None, all=False):
 				### END MASSIVE HACK ALERT
 				# Find the next event in the recurrence that isn't an exception
 				search_date = after
-				#while True:
-				#	search_date = rrule.after(search_date)
-				#	if search_date is None or search_date - cutoff_delay not in exception_times:
-				#		break
-				event_time_cutoff = search_date
+				while True:
+					#search_date = rrule.after(search_date)
+					if search_date is None or search_date - cutoff_delay not in exception_times:
+						break
+				event_time_cutoff = after
 				if event_time_cutoff is None:
 					continue
 				event_time = event_time_cutoff - cutoff_delay
-			if event_time_cutoff > after:
-				events.append((event_name, event_time))
-				
+			events.append((event_name, event_time))
 	if events:
 		event_name, event_time = min(events, key=operator.itemgetter(1))
 		return event_name

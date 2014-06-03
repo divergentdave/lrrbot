@@ -5,13 +5,14 @@ from commands.game import completed, game_name
 
 def stat_update(lrrbot, stat, n, set_=False):
 	game = lrrbot.get_current_game()
+	driver = lrrbot.get_driver(lrrbot, conn, event, respond_to)
 	if game is None:
 		return None
 	game.setdefault("stats", {}).setdefault(stat, 0)
 	if set_:
-		game["stats"][stat] = n
+		game[driver]["stats"][stat] = n
 	else:
-		game["stats"][stat] += n
+		game[driver]["stats"][stat] += n
 	storage.save()
 	return game
 
@@ -70,11 +71,9 @@ def stat_print(lrrbot, conn, event, respond_to, stat, game=None, with_emote=Fals
 		emote = stat_details["emote"] + " "
 	else:
 		emote = ""
-	conn.privmsg(respond_to, "%s%d %s for %s" % (emote, count, display, game_name(game)))
+	conn.privmsg(respond_to, "%s%d %s for %s in %s" % (emote, count, display, driver.driver_name, game_name(game)))
 	if countT == 1000:
 		conn.privmsg(respond_to, "Watch and pray for another %d %s!" % (countT, display))
-	if countT == 2500:
-		conn.privmsg(respond_to, "For hitting this milestone here's some code drop, Fez: 63BT5-GQ72Z-6L068 Mark of the Ninja: C03YW-YX0CA-IYC85 FTL: 5539N-PAREC-J4YGM Bastion: TE4M2-A5V64-BITNV" % (countT, display))
 
 @utils.throttle(params=[4])
 def printtotal(lrrbot, conn, event, respond_to, stat):

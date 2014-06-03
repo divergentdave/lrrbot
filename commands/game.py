@@ -15,6 +15,7 @@ def current_game(lrrbot, conn, event, respond_to):
 	Post the game currently being played.
 	"""
 	game = lrrbot.get_current_game()
+	driver = driver.driver_name()
 	if game is None:
 		message = "Not currently playing any game"
 	else:
@@ -69,12 +70,13 @@ def set_game_name(lrrbot, conn, event, respond_to, name):
 	Change the display name of the current game to NAME.
 	"""
 	game = lrrbot.get_current_game()
+	driver = driver.driver_name()
 	if game is None:
 		conn.privmsg(respond_to, "Not currently playing any game, if they are yell at them to update the stream")
 		return
-	game["display"] = name
+	game[driver]["display"] = name
 	storage.save()
-	conn.privmsg(respond_to, "OK, I'll start calling %(name)s \"%(display)s\"" % game)
+	conn.privmsg(respond_to, "OK, I'll start calling %(name)s \"%(display)s\" in %s shift" % (game, driver))
 
 @bot.command("game override (.*?)")
 @utils.mod_only
@@ -134,6 +136,6 @@ def completed(lrrbot, conn, event, respond_to):
 		conn.privmsg(respond_to, "Not currently playing any game")
 		return
 	game.setdefault("stats", {}).setdefault("completed", 0)
-	game["stats"]["completed"] += 1
+	game[driver]["stats"]["completed"] += 1
 	storage.save()
 	conn.privmsg(respond_to, "%s added to the completed list" % game_name(game))

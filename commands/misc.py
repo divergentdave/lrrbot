@@ -87,9 +87,9 @@ def event(lrrbot, conn, event, respond_to):
 		
 @bot.command("title")
 @utils.throttle()
-def event(lrrbot, conn, event, respond_to):
+def title(lrrbot, conn, event, respond_to):
 	"""
-	Gets the current event from the calendar
+	Gets the current title from the stream
 	mostly for driver testing purpose
 	will remove
 	"""
