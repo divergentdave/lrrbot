@@ -1,0 +1,41 @@
+CREATE TABLE shows (
+	showid SERIAL PRIMARY KEY,
+	showkey VARCHAR(50) NOT NULL,
+	displayname TEXT
+);
+CREATE UNIQUE INDEX show_key_idx ON shows(showkey);
+
+CREATE TYPE game_status AS ENUM('new', 'unverified', 'verified', 'flagged', 'deleted');
+CREATE TABLE games (
+	gameid SERIAL PRIMARY KEY,
+	showid INTEGER NOT NULL REFERENCES shows(showid) ON DELETE CASCADE,
+	twitchid INTEGER,
+	name TEXT NOT NULL,
+	displayname TEXT,
+	status game_status NOT NULL
+);
+CREATE INDEX game_twitch_id_idx ON games(showid, twitchid);
+CREATE INDEX game_name_idx ON games(showid, name);
+
+CREATE TABLE stats (
+	statid SERIAL PRIMARY KEY,
+	statkey VARCHAR(50) NOT NULL,
+	displayname TEXT,
+	displayplural TEXT,
+	emote TEXT
+);
+CREATE UNIQUE INDEX stat_key_idx ON stats(statkey);
+
+CREATE TABLE game_stats (
+	gameid INTEGER NOT NULL REFERENCES games(gameid) ON DELETE CASCADE,
+	statid INTEGER NOT NULL REFERENCES stats(statid) ON DELETE CASCADE,
+	statcount INTEGER NOT NULL,
+	PRIMARY KEY (gameid, statid)
+);
+
+CREATE TABLE game_votes (
+	gameid INTEGER NOT NULL REFERENCES games(gameid) ON DELETE CASCADE,
+	username VARCHAR(50) NOT NULL,
+	vote BOOLEAN,
+	PRIMARY KEY (gameid, username)
+);
